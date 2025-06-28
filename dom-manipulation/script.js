@@ -1,4 +1,4 @@
-// load quotes from localStorage if available, otherwise use defaults
+// load quotes from localStorage if available, otherwise defaults
 let quotes = JSON.parse(localStorage.getItem("quotes")) || [
   { text: "The only limit is your mind.", category: "Motivation" },
   { text: "Creativity takes courage.", category: "Inspiration" },
@@ -10,7 +10,7 @@ function saveQuotes() {
   localStorage.setItem("quotes", JSON.stringify(quotes));
 }
 
-// display a random quote
+// show a random quote
 function showRandomQuote() {
   const randomIndex = Math.floor(Math.random() * quotes.length);
   const quote = quotes[randomIndex];
@@ -23,18 +23,16 @@ function showRandomQuote() {
     </blockquote>
   `;
 
-  // store the last displayed quote in sessionStorage
+  // store last viewed quote in sessionStorage
   sessionStorage.setItem("lastQuote", JSON.stringify(quote));
 }
 
-// attach event listener to Show New Quote button
+// event listener for show new quote
 document.getElementById("newQuote").addEventListener("click", showRandomQuote);
 
-// dynamically create the add-quote form + import/export UI
+// create the add-quote form
 function createAddQuoteForm() {
   const container = document.getElementById("addQuoteContainer");
-
-  const formDiv = document.createElement("div");
 
   const inputText = document.createElement("input");
   inputText.id = "newQuoteText";
@@ -50,30 +48,12 @@ function createAddQuoteForm() {
   button.textContent = "Add Quote";
   button.addEventListener("click", addQuote);
 
-  // JSON export button
-  const exportButton = document.createElement("button");
-  exportButton.textContent = "Export Quotes (JSON)";
-  exportButton.addEventListener("click", exportQuotes);
-
-  // JSON import input
-  const importInput = document.createElement("input");
-  importInput.type = "file";
-  importInput.accept = ".json";
-  importInput.id = "importFile";
-  importInput.addEventListener("change", importFromJsonFile);
-
-  formDiv.appendChild(inputText);
-  formDiv.appendChild(inputCategory);
-  formDiv.appendChild(button);
-  formDiv.appendChild(document.createElement("br"));
-  formDiv.appendChild(exportButton);
-  formDiv.appendChild(document.createElement("br"));
-  formDiv.appendChild(importInput);
-
-  container.appendChild(formDiv);
+  container.appendChild(inputText);
+  container.appendChild(inputCategory);
+  container.appendChild(button);
 }
 
-// add new quote to the array and save
+// add a new quote
 function addQuote() {
   const text = document.getElementById("newQuoteText").value.trim();
   const category = document.getElementById("newQuoteCategory").value.trim();
@@ -89,21 +69,21 @@ function addQuote() {
   }
 }
 
-// export quotes to JSON file
-function exportQuotes() {
-  const dataStr = JSON.stringify(quotes, null, 2);
-  const blob = new Blob([dataStr], { type: "application/json" });
+// export to JSON file
+function exportToJsonFile() {
+  const data = JSON.stringify(quotes, null, 2);
+  const blob = new Blob([data], { type: "application/json" });
   const url = URL.createObjectURL(blob);
 
   const link = document.createElement("a");
   link.href = url;
   link.download = "quotes.json";
   link.click();
-
+  
   URL.revokeObjectURL(url);
 }
 
-// import quotes from a JSON file
+// import from JSON file
 function importFromJsonFile(event) {
   const fileReader = new FileReader();
   fileReader.onload = function (e) {
@@ -114,19 +94,22 @@ function importFromJsonFile(event) {
         saveQuotes();
         alert("Quotes imported successfully!");
       } else {
-        alert("Invalid JSON format.");
+        alert("Invalid JSON file.");
       }
     } catch (err) {
-      alert("Error parsing JSON file.");
+      alert("Error parsing JSON.");
     }
   };
   fileReader.readAsText(event.target.files[0]);
 }
 
-// initialize
+// attach event listener to Export button
+document.getElementById("exportQuotes").addEventListener("click", exportToJsonFile);
+
+// call form creator on page load
 createAddQuoteForm();
 
-// OPTIONAL: show the last quote from sessionStorage
+// optional: load last quote if exists
 const last = sessionStorage.getItem("lastQuote");
 if (last) {
   const quote = JSON.parse(last);
@@ -138,5 +121,6 @@ if (last) {
     </blockquote>
   `;
 }
+
 
 
